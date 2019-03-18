@@ -24,16 +24,15 @@ static struct cdev *fib_cdev;
 static struct class *fib_class;
 static DEFINE_MUTEX(fib_mutex);
 
-static long long fib_sequence(long long k)
+long long fib_sequence(long long k)
 {
-    /* FIXME: use clz/ctz and fast algorithms to speed up */
     long long f[2] = {0, 1};
-    int n = 64 - __builtin_clzll(k);
-    for (int i = 0; i < n; i++) {
+    int n = 63 - __builtin_clzll(k);
+    for (int i = 0; i <= n; i++) {
         // a = F2n+1;  b = F2n
         long long a = f[1] * f[1] + f[0] * f[0];
         long long b = f[0] * (2 * f[1] - f[0]);
-        if ((k >> (n - i - 1)) & 1) {
+        if ((k >> (n - i)) & 1) {
             // n is odd
             f[0] = a;
             f[1] = a + b;
